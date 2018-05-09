@@ -18,16 +18,23 @@ namespace PokemonDatabase
         public Form1()
         {
             InitializeComponent();
+
+            Console.Write("beginning \n");
         }
 
         private void Download_Set_Names_Click(object sender, EventArgs e)
         {
             Database db = new Database();
             db.InitializeDatabase();
+            List<CardSet> lSets;
+            Console.Write("created database \n");
 
             string[] ttarray = new string[] { "https://www.trollandtoad.com/Pokemon/7061.html", "inline smallFont subCats", "<a onclick='openSets()' class='seeAllCats'>" };
-            string[] tcgArray = new string[] { "https://shop.tcgplayer.com/pokemon", "<select id=\"SetName\" name=\"SetName\">", "<div class=\"SearchParameter Floating\">" };
-            if (TandT.Checked) { getAllSets(ttarray); } else { getAllSets(tcgArray); }
+            string[] tcgArray = new string[] { "https://shop.tcgplayer.com/pokemon", "<div class=\"magicSets\" style=\"font - family:Arial; \">", "<a href=\"https://shop.tcgplayer.com/pokemon" };
+            if (TandT.Checked) {  lSets = getAllSets(ttarray); } else { lSets = getAllSets(tcgArray); }
+
+            Console.Write("Lset size is " + lSets.Count +"\n");
+            if (lSets != null) { db.AddSets(lSets); }
         }
 
         private void Get_Card_Names_Click(object sender, EventArgs e)
@@ -35,7 +42,7 @@ namespace PokemonDatabase
 
         }
 
-        private void getAllSets(string[] URL)
+        private List<CardSet> getAllSets(string[] URL)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL[0]);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -49,7 +56,7 @@ namespace PokemonDatabase
                 if (response.CharacterSet == null) { readStream = new StreamReader(receiveStream); }
                 else { readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet)); }
 
-                string data = "";
+                string data;
                 while((data = readStream.ReadLine()).Contains(URL[1]) == false) { }
 
                 List<CardSet> lSets = new List<CardSet>();
@@ -61,8 +68,11 @@ namespace PokemonDatabase
                 }
                 response.Close();
                 readStream.Close();
-                //TODO add connection with database here
+
+                Console.Write("Got here \n");
+                return lSets;
             }
+            return null;
         }
 
         private CardSet AssignInfo(Boolean b, int i, string nameString)
@@ -71,6 +81,8 @@ namespace PokemonDatabase
             try
             {
                 int offset = 4;
+//TODO
+//Add new logic for TCG player beginning and ending, we've changed shit
                 if (nameString.Contains("inline smallFont subCats")) { offset = offset + 48; }
                 if (nameString.Contains("subCatAlphaHeader")) { offset = offset + 36; }
                 if (b)
@@ -85,7 +97,10 @@ namespace PokemonDatabase
                 }
                 currentSet.setSetNum(i);
             }
-            catch { }
+            catch
+            {
+                Console.Write("Is this the stupid error spot?\n");
+            }
             return currentSet;
         }
 

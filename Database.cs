@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using System.IO;
+using System.Data.SQLite;
 
 namespace PokemonDatabase
 {
@@ -18,34 +19,72 @@ namespace PokemonDatabase
 
         public void InitializeDatabase()
         {
-            if (File.Exists("Pokemon.db"))
+            if (!File.Exists("Pokemon.db"))
             {
-                SqliteConnection db = new SqliteConnection("Filename=Pokemon.db");
-                db.Open();
-            }
-            else
-            {
-                using (SqliteConnection db =
-                    new SqliteConnection("Filename=Pokemon.db"))
+                SQLiteConnection.CreateFile("Pokemon.db");
+                using (SQLiteConnection db = new SQLiteConnection("data source=Pokemon.db"))
                 {
                     db.Open();
 
                     string tableCommand = "CREATE TABLE IF NOT " +
                     "EXISTS CardSets (Primary_Key INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "setNumber integer, setName text, URL text )";
-                    SqliteCommand createTable = new SqliteCommand(tableCommand, db);
+                    SQLiteCommand createTable = new SQLiteCommand(tableCommand, db);
 
                     createTable.ExecuteReader();
 
                     tableCommand = "CREATE TABLE IF NOT " +
                     "EXISTS PokemonCards (Primary_Key INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "setNumber integer, pokemonName text, cardCost REAL )";
-                    createTable = new SqliteCommand(tableCommand, db);
-
+                    "setNumber integer, pokemonName text, cardCost REAL, energyType text )";
+                    createTable = new SQLiteCommand(tableCommand, db);
 
                     createTable.ExecuteReader();
                 }
             }
+
+        }
+        public void AddSets(List<CardSet> CardSets)
+        {
+            try
+            {
+                List<string> TableSets = new List<string>();
+                SQLiteCommand cmd;
+                string sqlCmd;
+
+                Console.Write("Got into addsets \n");
+                using (SQLiteConnection db = new SQLiteConnection("data source=Pokemon.db"))
+                {
+                    db.Open();
+                    sqlCmd = "SELECT setName FROM CardSets";
+                    cmd = new SQLiteCommand(sqlCmd, db);
+                    #region This is going to grab a list of all Card Sets in the table currently
+                    using (SQLiteDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            TableSets.Add(rdr[0].ToString());
+                            Console.Write(rdr[0].ToString());
+                        }
+                    }
+                    #endregion
+                    for (int i = 0; i < CardSets.Count; i++)
+                    {
+                        if (!TableSets.Contains(CardSets[i].getName()))
+                        {
+                            cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, setName, URL) VALUES (?,?,?)", db);
+
+                            Console.Write("ready to insert! \n");
+                            //Console.Write(CardSets[i].getSetNum());
+                            cmd.Parameters.Add(CardSets[i].getSetNum());
+                            cmd.Parameters.Add(CardSets[i].getName());
+                            cmd.Parameters.Add(CardSets[i].getURL());
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+
+            }
+            catch(Exception e) { Console.Write("Exception information: {0}", e); }
         }
     }
     
