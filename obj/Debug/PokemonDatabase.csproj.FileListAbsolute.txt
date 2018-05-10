@@ -11,3 +11,12 @@ C:\Users\Nik\Documents\GitHub\PokemonDatabase\PokemonDatabase\bin\Debug\Microsof
 C:\Users\Nik\Documents\GitHub\PokemonDatabase\PokemonDatabase\bin\Debug\System.Data.SQLite.xml
 C:\Users\Nik\Documents\GitHub\PokemonDatabase\PokemonDatabase\obj\Debug\PokemonDatabase.exe
 C:\Users\Nik\Documents\GitHub\PokemonDatabase\PokemonDatabase\obj\Debug\PokemonDatabase.pdb
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\bin\Debug\PokemonDatabase.exe.config
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\bin\Debug\PokemonDatabase.exe
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\bin\Debug\PokemonDatabase.pdb
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.Form1.resources
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.Properties.Resources.resources
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.csproj.GenerateResource.Cache
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.csproj.CoreCompileInputs.cache
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.exe
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.pdb

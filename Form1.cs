@@ -30,7 +30,7 @@ namespace PokemonDatabase
             Console.Write("created database \n");
 
             string[] ttarray = new string[] { "https://www.trollandtoad.com/Pokemon/7061.html", "inline smallFont subCats", "<a onclick='openSets()' class='seeAllCats'>" };
-            string[] tcgArray = new string[] { "https://shop.tcgplayer.com/pokemon", "<div class=\"magicSets\" style=\"font - family:Arial; \">", "<a href=\"https://shop.tcgplayer.com/pokemon" };
+            string[] tcgArray = new string[] { "https://shop.tcgplayer.com/pokemon", "<div class=\"magicSets\" style=\"font-family:Arial;\">", "<BR clear=all>" };
             if (TandT.Checked) {  lSets = getAllSets(ttarray); } else { lSets = getAllSets(tcgArray); }
 
             Console.Write("Lset size is " + lSets.Count +"\n");
@@ -64,7 +64,16 @@ namespace PokemonDatabase
 
                 while ((data = readStream.ReadLine()).Contains(URL[2]) == false)
                 {
-                    lSets.Add(AssignInfo(TandT.Checked, countOfSets++, data));
+                    if (!TandT.Checked && data.Contains("<a href=\"https://shop.tcgplayer.com/pokemon"))
+                    {
+                        lSets.Add(AssignInfo(TandT.Checked, countOfSets++, data.Trim()));
+                    }
+                    else if(TandT.Checked)
+                    {
+                        lSets.Add(AssignInfo(TandT.Checked, countOfSets++, data.Trim()));
+                    }
+
+         
                 }
                 response.Close();
                 readStream.Close();
@@ -75,14 +84,13 @@ namespace PokemonDatabase
             return null;
         }
 
-        private CardSet AssignInfo(Boolean b, int i, string nameString)
+        private CardSet AssignInfo(bool b, int i, string nameString)
         {
             CardSet currentSet = new CardSet();
             try
             {
                 int offset = 4;
-//TODO
-//Add new logic for TCG player beginning and ending, we've changed shit
+                string[] stringToParse;
                 if (nameString.Contains("inline smallFont subCats")) { offset = offset + 48; }
                 if (nameString.Contains("subCatAlphaHeader")) { offset = offset + 36; }
                 if (b)
@@ -92,8 +100,11 @@ namespace PokemonDatabase
                 }
                 else
                 {
-                    currentSet.setName(nameString.Replace("\"", "#").Replace("&amp", "&").Split('#')[1]);
-                    currentSet.URLCreation();
+                    stringToParse = nameString.Replace("&amp;", "&").Replace("</a>", "^").Replace(">", "^").Split('^');
+                    currentSet.setName(stringToParse[1]);
+                    stringToParse = nameString.Replace("<a href=\"", "^").Replace("?", "^").Split('^');
+                    if (stringToParse[1].Contains("\" style")) { stringToParse = nameString.Replace("<a href=\"", "^").Replace("\" style", "^").Split('^'); }
+                    currentSet.setURL(stringToParse[1]);
                 }
                 currentSet.setSetNum(i);
             }

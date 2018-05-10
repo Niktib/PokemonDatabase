@@ -71,13 +71,12 @@ namespace PokemonDatabase
                     {
                         if (!TableSets.Contains(CardSets[i].getName()))
                         {
-                            cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, setName, URL) VALUES (?,?,?)", db);
+                            cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, setName, URL) VALUES (@num,@name,@url)", db);
 
                             Console.Write("ready to insert! \n");
-                            //Console.Write(CardSets[i].getSetNum());
-                            cmd.Parameters.Add(CardSets[i].getSetNum());
-                            cmd.Parameters.Add(CardSets[i].getName());
-                            cmd.Parameters.Add(CardSets[i].getURL());
+                            cmd.Parameters.AddWithValue("@num", CardSets[i].getSetNum());
+                            cmd.Parameters.AddWithValue("@name", CardSets[i].getName());
+                            cmd.Parameters.AddWithValue("@url", CardSets[i].getURL());
                             cmd.ExecuteNonQuery();
                         }
                     }
