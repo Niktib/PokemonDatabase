@@ -8,39 +8,30 @@ namespace PokemonDatabase
 {
     class CardSet
     {
-        private string name;
-        private int setNum;
-        private string URL;
-
-
-        public void setName(string _name) { name = _name; }
-        public string getName() { return name; }
-        public void setSetNum(int _Num) { setNum = _Num; }
-        public int getSetNum() { return setNum; }
-        public void setURL(string _URL) { URL = _URL; }
-        public string getURL() { return URL; }
+        public int iSetNum { get; set; }
+        public string sURL { get; set; }
+        public string sName { get; set; }
 
         public CardSet()
         {
-            name = "";
-            setNum = 0;
-            URL = "";
+            sName = "";
+            iSetNum = 0;
+            sURL = "";
         }
 
         //Takes the name and generates the URL
         public void URLCreation()
         {
             string URLinProgress;
-
-            if (name.Contains('-'))
+            if (sName.Contains('-'))
             {
-                URLinProgress = name.Substring(0, 5).Replace(" ", "") + name.Substring(6).Replace(" ", "-");
+                URLinProgress = sName.Substring(0, 5).Replace(" ", "") + sName.Substring(6).Replace(" ", "-");
             }
             else
             {
-                URLinProgress = name.Replace(" ", "-");
+                URLinProgress = sName.Replace(" ", "-");
             }
-            this.URL = URLinProgress.Replace(":", "");
+            this.sURL = URLinProgress.Replace(":", "");
         }
     }
 }
