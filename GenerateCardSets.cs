@@ -71,7 +71,6 @@ namespace PokemonDatabase
             }
             catch
             {
-                Console.Write("Is this the stupid error spot?\n");
             }
             return currentSet;
         }

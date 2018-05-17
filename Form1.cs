@@ -15,14 +15,11 @@ namespace PokemonDatabase
         public Form1()
         {
             InitializeComponent();
-
-            Console.Write("beginning \n");
         }
 
         private void Download_Set_Names_Click(object sender, EventArgs e)
         {
             Database db = new Database();
-            db.InitializeDatabase();
             GenerateCardSets GCS = new GenerateCardSets(TandT.Checked);
             List<CardSet> lSets = GCS.GetCardsSets();
 
@@ -31,7 +28,17 @@ namespace PokemonDatabase
 
         private void Get_Card_Names_Click(object sender, EventArgs e)
         {
+            
+            Database db = new Database();
+            List<string> setURLs = db.retrieveAllSetURLs();
+            List<int> setNums = db.retrieveAllSetNumbers();
+            for (int i = 0; i < 1; i++)
+            {
+                GenerateCardNames GCN = new GenerateCardNames(TandT.Checked, setURLs[i], setNums[i]);
+                List<CardName> lNames = GCN.GetCardsNames();
 
+                if (lNames != null) { db.AddNames(lNames); }
+            }
         }
     }
 }
