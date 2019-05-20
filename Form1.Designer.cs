@@ -30,13 +30,12 @@
         {
             this.Download_Set_Names = new System.Windows.Forms.Button();
             this.Get_Card_Names = new System.Windows.Forms.Button();
-            this.TandT = new System.Windows.Forms.RadioButton();
             this.TCG = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // Download_Set_Names
             // 
-            this.Download_Set_Names.Location = new System.Drawing.Point(49, 77);
+            this.Download_Set_Names.Location = new System.Drawing.Point(12, 35);
             this.Download_Set_Names.Name = "Download_Set_Names";
             this.Download_Set_Names.Size = new System.Drawing.Size(190, 39);
             this.Download_Set_Names.TabIndex = 0;
@@ -46,7 +45,7 @@
             // 
             // Get_Card_Names
             // 
-            this.Get_Card_Names.Location = new System.Drawing.Point(49, 122);
+            this.Get_Card_Names.Location = new System.Drawing.Point(12, 80);
             this.Get_Card_Names.Name = "Get_Card_Names";
             this.Get_Card_Names.Size = new System.Drawing.Size(190, 38);
             this.Get_Card_Names.TabIndex = 2;
@@ -54,21 +53,10 @@
             this.Get_Card_Names.UseVisualStyleBackColor = true;
             this.Get_Card_Names.Click += new System.EventHandler(this.Get_Card_Names_Click);
             // 
-            // TandT
-            // 
-            this.TandT.AutoSize = true;
-            this.TandT.Location = new System.Drawing.Point(49, 22);
-            this.TandT.Name = "TandT";
-            this.TandT.Size = new System.Drawing.Size(94, 17);
-            this.TandT.TabIndex = 3;
-            this.TandT.TabStop = true;
-            this.TandT.Text = "Troll and Toad";
-            this.TandT.UseVisualStyleBackColor = true;
-            // 
             // TCG
             // 
             this.TCG.AutoSize = true;
-            this.TCG.Location = new System.Drawing.Point(192, 22);
+            this.TCG.Location = new System.Drawing.Point(86, 12);
             this.TCG.Name = "TCG";
             this.TCG.Size = new System.Drawing.Size(47, 17);
             this.TCG.TabIndex = 3;
@@ -80,9 +68,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(210, 126);
             this.Controls.Add(this.TCG);
-            this.Controls.Add(this.TandT);
             this.Controls.Add(this.Get_Card_Names);
             this.Controls.Add(this.Download_Set_Names);
             this.Name = "Form1";
@@ -96,7 +83,6 @@
 
         private System.Windows.Forms.Button Download_Set_Names;
         private System.Windows.Forms.Button Get_Card_Names;
-        private System.Windows.Forms.RadioButton TandT;
         private System.Windows.Forms.RadioButton TCG;
     }
 }

@@ -5,31 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.IO;
-
+using System.Text.RegularExpressions;
 
 namespace PokemonDatabase
 {
     class GenerateCardSets
     {
-        private bool TandT;
-        public GenerateCardSets(bool WhichSite)
-        {
-            TandT = WhichSite;
-        }
         public List<CardSet> GetCardsSets()
         {
-            string[] ttarray = new string[] { "https://www.trollandtoad.com/Pokemon/7061.html", "inline smallFont subCats", "<a onclick='openSets()' class='seeAllCats'>" };
-            string[] tcgArray = new string[] { "https://shop.tcgplayer.com/pokemon", "<div class=\"magicSets\" style=\"font-family:Arial;\">", "<BR clear=all>" };
-            if (TandT) { return getAllSets(ttarray); } else { return getAllSets(tcgArray); }
-
-        }
-        private List<CardSet> getAllSets(string[] URL)
-        {
+            string[] URL = new string[] { @"https://shop.tcgplayer.com/pokemon", "<div class=\"magicSets\" style=\"font-family:Arial;\">", "<BR clear=all>" };
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL[0]);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
+
                 Stream receiveStream = response.GetResponseStream();
                 StreamReader readStream = null;
 
@@ -55,7 +45,9 @@ namespace PokemonDatabase
                 return lSets;
             }
             return null;
+
         }
+
         private CardSet AssignInfo(int i, string nameString)
         {
             CardSet currentSet = new CardSet();
@@ -73,6 +65,27 @@ namespace PokemonDatabase
             {
             }
             return currentSet;
+        }
+        private int requestDelay()
+        {
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            var request = WebRequest.Create(@"https://www.tcgplayer.com/robots.txt");
+
+            using (var response = request.GetResponse())
+            using (var content = response.GetResponseStream())
+            using (var reader = new StreamReader(content))
+            {
+                var strContent = reader.ReadToEnd().ToLower();
+                foreach (var line in strContent.Split('\n'))
+                {
+                    if (line.Contains("crawl-delay"))
+                    {
+                        return Int32.Parse(Regex.Match(line, @"\d+$").ToString());
+                    }
+                }
+            }
+            return 0;
         }
     }
 }
