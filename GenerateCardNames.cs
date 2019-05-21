@@ -10,24 +10,21 @@ namespace PokemonDatabase
 {
     class GenerateCardNames
     {
-        private bool TandT;
-        private string setURL { get; set; }
-        private int setIDKey { get; set; }
+        private string SetURL { get; set; }
+        private int SetIDKey { get; set; }
 
-        public GenerateCardNames(bool WhichSite, string _setURL, int _setIDKey)
+        public GenerateCardNames(string _setURL, int _setIDKey)
         {
-            TandT = WhichSite;
-            setURL = _setURL;
-            setIDKey = _setIDKey;
+            SetURL = _setURL;
+            SetIDKey = _setIDKey;
         }
         public List<CardName> GetCardsNames()
         {
-            string[] ttarray = new string[] { "", "", "" };
-            string[] tcgArray = new string[] { setURL + "?newSearch=false&Type=Cards&orientation=grid&lu=true&PageNumber=", "gtmData.searchResults = [];", "<script>trackProductsEvent" };
-            if (TandT) { return getAllCards(ttarray); } else { return getAllCards(tcgArray); }
+            string[] tcgArray = new string[] { SetURL + "?newSearch=false&Type=Cards&orientation=grid&lu=true&PageNumber=", "gtmData.searchResults = [];", "<script>trackProductsEvent" };
+            return GetAllCards(tcgArray);
 
         }
-        private List<CardName> getAllCards(string[] URL)
+        private List<CardName> GetAllCards(string[] URL)
         {
             List<CardName> lCards = new List<CardName>();
             for (int i = 1; i < 11; i++)
@@ -56,8 +53,8 @@ namespace PokemonDatabase
 
                         if (data.Contains("<a href=\"/pokemon/") && !data.Contains(beWary))
                         {
-                            lCards.Add(AssignInfo(TandT, data.Trim().Replace("<a href=\"", "")));
-                            beWary = lCards[lCards.Count-1].sURL;
+                            lCards.Add(AssignInfo(data.Trim().Replace("<a href=\"", "")));
+                            beWary = lCards[lCards.Count-1].URL;
                         }
                     }
                     response.Close();
@@ -71,19 +68,16 @@ namespace PokemonDatabase
 
             return lCards;
         }
-        private CardName AssignInfo(bool b, string nameString)
+        private CardName AssignInfo(string nameString)
         {
             CardName currentCard = new CardName();
             try
             {
                 ///pokemon/sm-forbidden-light/mysterious-treasure?xid=i6f83e066ca6c474894c507745ed0f48c" class="product__click-target" onclick="trackProductEvent('productClick', 'click', 'articuno ex team plasma', '83656', 'Pokemon', 2, '');"></a>
                 string[] stringToParse;
-                if (!b)
-                {
-                    stringToParse = nameString.Replace("\" class=\"product", "^").Split('^');
-                    currentCard.sURL = "https://shop.tcgplayer.com" + stringToParse[0];
-                    currentCard.iCardSet = setIDKey;
-                }
+                stringToParse = nameString.Replace("\" class=\"product", "^").Split('^');
+                currentCard.URL = "https://shop.tcgplayer.com" + stringToParse[0];
+                currentCard.CardSet = SetIDKey;
             }
             catch
             {

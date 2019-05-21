@@ -9,20 +9,20 @@ namespace PokemonDatabase
 {
     class CardName
     {
-        public int iCardNum { get; set; }
-        public string sURL { get; set; }
-        public string sName { get; set; }
-        public double dPrice { get; set; }
-        public int iCardSet { get; set; }
-        public Bitmap bitmap { get; set; }
+        public int CardNum { get; set; }
+        public string URL { get; set; }
+        public string Name { get; set; }
+        public double Price { get; set; }
+        public int CardSet { get; set; }
+        public Bitmap CardArt { get; set; }
 
         public CardName()
         {
-            iCardNum = 0;
-            sURL = "";
-            sName = "";
-            dPrice = 0;
-            bitmap = null;
+            CardNum = 0;
+            URL = "";
+            Name = "";
+            Price = 0;
+            CardArt = null;
         }
 
     }

@@ -37,7 +37,7 @@ namespace PokemonDatabase
                 }
             }
         }
-        public List<int> retrieveAllSetNumbers()
+        public List<int> RetrieveAllSetNumbers()
         {
             List<int> TableSets = new List<int>();
             using (SQLiteConnection db = new SQLiteConnection("data source=Pokemon.db"))
@@ -56,7 +56,7 @@ namespace PokemonDatabase
             }
             return TableSets;
         }
-        public List<string> retrieveAllSetURLs()
+        public List<string> RetrieveAllSetURLs()
         {
             List<string> TableSets = new List<string>();
             using (SQLiteConnection db = new SQLiteConnection("data source=Pokemon.db"))
@@ -85,14 +85,14 @@ namespace PokemonDatabase
 
                     for (int i = 0; i < CardNames.Count; i++)
                     {
-                        if (!TableSets.Contains(CardNames[i].sName))
+                        if (!TableSets.Contains(CardNames[i].Name))
                         {
                             cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, pokemonName, cardURL, cardCost, pokemonNumber) VALUES (@num,@name,@url,@cost,@cardnum)", db);
-                            cmd.Parameters.AddWithValue("@num", CardNames[i].iCardSet);
-                            cmd.Parameters.AddWithValue("@name", CardNames[i].sName);
-                            cmd.Parameters.AddWithValue("@url", CardNames[i].sURL);
-                            cmd.Parameters.AddWithValue("@cost", CardNames[i].dPrice);
-                            cmd.Parameters.AddWithValue("@cardnum", CardNames[i].iCardNum);
+                            cmd.Parameters.AddWithValue("@num", CardNames[i].CardSet);
+                            cmd.Parameters.AddWithValue("@name", CardNames[i].Name);
+                            cmd.Parameters.AddWithValue("@url", CardNames[i].URL);
+                            cmd.Parameters.AddWithValue("@cost", CardNames[i].Price);
+                            cmd.Parameters.AddWithValue("@cardnum", CardNames[i].CardNum);
 
                             cmd.ExecuteNonQuery();
                         }
@@ -126,13 +126,12 @@ namespace PokemonDatabase
                     #endregion
                     for (int i = 0; i < CardSets.Count; i++)
                     {
-                        if (!TableSets.Contains(CardSets[i].sName))
+                        if (!TableSets.Contains(CardSets[i].Name))
                         {
-                            cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, setName, URL) VALUES (@num,@name,@url)", db);
+                            cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, setName, URL) VALUES (@name,@url)", db);
                             
-                            cmd.Parameters.AddWithValue("@num", CardSets[i].iSetNum);
-                            cmd.Parameters.AddWithValue("@name", CardSets[i].sName);
-                            cmd.Parameters.AddWithValue("@url", CardSets[i].sURL);
+                            cmd.Parameters.AddWithValue("@name", CardSets[i].Name);
+                            cmd.Parameters.AddWithValue("@url", CardSets[i].URL);
                             cmd.ExecuteNonQuery();
                         }
                     }

@@ -13,32 +13,32 @@ namespace PokemonDatabase
     {
         public List<CardSet> GetCardsSets()
         {
-            string[] URL = new string[] { @"https://shop.tcgplayer.com/pokemon", "<div class=\"magicSets\" style=\"font-family:Arial;\">", "<BR clear=all>" };
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL[0]);
+            string URL =  @"https://shop.tcgplayer.com/pokemon";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-
                 Stream receiveStream = response.GetResponseStream();
                 StreamReader readStream = null;
-
-
+                
                 if (response.CharacterSet == null) { readStream = new StreamReader(receiveStream); }
                 else { readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet)); }
 
-                string data;
-                while ((data = readStream.ReadLine()).Contains(URL[1]) == false) { }
+                string data = readStream.ReadToEnd();
+                Regex setLinks = new Regex("(?<=<a href=\")[!-z]*pokemon[!-z]*(?=\")");
+                Regex setNames = new Regex("(?<=</i>)[!-z ]*(?=</a>)");
+                MatchCollection setLinksMatches = setLinks.Matches(data);
+                MatchCollection setNamesMatches = setNames.Matches(data);
+
 
                 List<CardSet> lSets = new List<CardSet>();
-                int countOfSets = 1;
-
-                while ((data = readStream.ReadLine()).Contains(URL[2]) == false)
+                int countOfSets = 0;
+                foreach (string setName in setNamesMatches)
                 {
-                    if (data.Contains("<a href=\"https://shop.tcgplayer.com/pokemon"))
-                    {
-                        lSets.Add(AssignInfo(countOfSets++, data.Trim()));
-                    }
+                    string alteredSetName = setName.Replace("&amp;", "&").Replace("&nbsp;", "").Replace("<br>", " ");
+                    lSets.Add(new CardSet(alteredSetName, setLinksMatches[countOfSets].ToString()));
+                    countOfSets++;
                 }
                 response.Close();
                 readStream.Close();
@@ -48,25 +48,7 @@ namespace PokemonDatabase
 
         }
 
-        private CardSet AssignInfo(int i, string nameString)
-        {
-            CardSet currentSet = new CardSet();
-            try
-            {
-                string[] stringToParse;
-                stringToParse = nameString.Replace("&amp;", "&").Replace("</a>", "^").Replace(">", "^").Split('^');
-                currentSet.sName = stringToParse[1];
-                stringToParse = nameString.Replace("<a href=\"", "^").Replace("?", "^").Split('^');
-                if (stringToParse[1].Contains("\" style")) { stringToParse = nameString.Replace("<a href=\"", "^").Replace("\" style", "^").Split('^'); }
-                currentSet.sURL = stringToParse[1];
-                currentSet.iSetNum = i;
-            }
-            catch
-            {
-            }
-            return currentSet;
-        }
-        private int requestDelay()
+        private int RequestDelay()
         {
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
