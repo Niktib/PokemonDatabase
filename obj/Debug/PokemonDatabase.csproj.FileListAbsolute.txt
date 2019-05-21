@@ -19,3 +19,4 @@ C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.csproj
 C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.exe
 C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.pdb
 C:\Users\tib-n\Documents\GitHub\PokemonDatabase\obj\Debug\PokemonDatabase.csprojResolveAssemblyReference.cache
+C:\Users\tib-n\Documents\GitHub\PokemonDatabase\bin\Debug\System.Data.SQLite.xml

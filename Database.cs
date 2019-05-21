@@ -128,8 +128,9 @@ namespace PokemonDatabase
                     {
                         if (!TableSets.Contains(CardSets[i].Name))
                         {
-                            cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, setName, URL) VALUES (@name,@url)", db);
-                            
+                            cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, setName, URL) VALUES (@number, @name,@url)", db);
+
+                            cmd.Parameters.AddWithValue("@number", CardSets[i].SetNumber);
                             cmd.Parameters.AddWithValue("@name", CardSets[i].Name);
                             cmd.Parameters.AddWithValue("@url", CardSets[i].URL);
                             cmd.ExecuteNonQuery();

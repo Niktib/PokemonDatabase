@@ -16,12 +16,12 @@ namespace PokemonDatabase
             string URL =  @"https://shop.tcgplayer.com/pokemon";
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
+            
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 Stream receiveStream = response.GetResponseStream();
                 StreamReader readStream = null;
-                
+
                 if (response.CharacterSet == null) { readStream = new StreamReader(receiveStream); }
                 else { readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet)); }
 
@@ -34,18 +34,28 @@ namespace PokemonDatabase
 
                 List<CardSet> lSets = new List<CardSet>();
                 int countOfSets = 0;
-                foreach (string setName in setNamesMatches)
+                foreach (Match setName in setNamesMatches)
                 {
-                    string alteredSetName = setName.Replace("&amp;", "&").Replace("&nbsp;", "").Replace("<br>", " ");
+                    string alteredSetName = setName.ToString().Replace("&amp;", "&").Replace("&nbsp;", "").Replace("<br>", " ");
                     lSets.Add(new CardSet(alteredSetName, setLinksMatches[countOfSets].ToString()));
                     countOfSets++;
                 }
+                PrintSets(lSets);
                 response.Close();
                 readStream.Close();
                 return lSets;
             }
             return null;
 
+        }
+
+        private void PrintSets(List<CardSet> lSets)
+        {
+            foreach (CardSet cs in lSets)
+            {
+                cs.Print();
+            }
+            Console.Read();
         }
 
         private int RequestDelay()
