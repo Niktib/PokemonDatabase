@@ -11,19 +11,22 @@ namespace PokemonDatabase
         public string URL { get; set; }
         public string Name { get; set; }
         public int SetNumber { get; set; }
+        public bool IsSet { get; set; }
 
         public CardSet()
         {
             Name = "";
             URL = "";
             SetNumber = 0;
+            IsSet = true;
         }
-        public CardSet(string _Name, string _URL)
+        public CardSet(string _Name, string _URL, int _SetNumber)
         {
             Name = _Name;
             URL = _URL;
-            SetNumber = 0;
-            URLCreation();
+            SetNumber = _SetNumber;
+            IsSet = true;
+            if (URL.Contains("tcg")) URLCreation();
         }
 
         //Takes the name and generates the URL

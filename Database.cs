@@ -30,48 +30,52 @@ namespace PokemonDatabase
 
                     tableCommand = "CREATE TABLE IF NOT " +
                     "EXISTS PokemonCards (Primary_Key INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "setNumber integer, pokemonName text, cardURL text, cardCost REAL, pokemonNumber integer )";
+                    "setNumber integer, pokemonName text, cardURL text, cardCost REAL, pokemonNumber integer)";
+                    createTable = new SQLiteCommand(tableCommand, db);
+
+                    createTable.ExecuteReader();
+
+                    tableCommand = "CREATE TABLE IF NOT " +
+                    "EXISTS PokemonCardArt (Primary_Key INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "pokeNum integer, cardArt BLOB)";
                     createTable = new SQLiteCommand(tableCommand, db);
 
                     createTable.ExecuteReader();
                 }
             }
         }
-        public List<int> RetrieveAllSetNumbers()
+
+        public List<CardSet> RetrieveAllSets()
         {
-            List<int> TableSets = new List<int>();
+            List<CardSet> list = new List<CardSet>();
+
             using (SQLiteConnection db = new SQLiteConnection("data source=Pokemon.db"))
             {
                 db.Open();
-                string sqlCmd = "SELECT setNumber FROM CardSets";
-                SQLiteCommand cmd = new SQLiteCommand(sqlCmd, db);
+
+                string stm = "SELECT * FROM CardSets";
                 
-                using (SQLiteDataReader rdr = cmd.ExecuteReader())
+                using (SQLiteCommand cmd = new SQLiteCommand(stm, db))
                 {
-                    while (rdr.Read())
+                    using (SQLiteDataReader rdr = cmd.ExecuteReader())
                     {
-                        TableSets.Add(Convert.ToInt32(rdr[0].ToString()));
+                        while (rdr.Read())
+                        {
+                            string name = rdr.GetString(2);
+                            string URL = rdr.GetString(3);
+                            int setNum = rdr.GetInt32(1);
+                            list.Add(new CardSet(name, URL, setNum));
+                        }
                     }
                 }
+                db.Close();
             }
-            return TableSets;
-        }
-        public List<string> RetrieveAllSetURLs()
-        {
-            List<string> TableSets = new List<string>();
-            using (SQLiteConnection db = new SQLiteConnection("data source=Pokemon.db"))
-            {
-                db.Open();
-                string sqlCmd = "SELECT URL FROM CardSets";
-                SQLiteCommand cmd = new SQLiteCommand(sqlCmd, db);
 
-                using (SQLiteDataReader rdr = cmd.ExecuteReader())
-                {
-                    while (rdr.Read()) { TableSets.Add(rdr[0].ToString()); }
-                }
-            }
-            return TableSets;
+            return list;
+
         }
+        
+
         public void AddNames(List<CardName> CardNames)
         {
             try
@@ -83,16 +87,29 @@ namespace PokemonDatabase
                 {
                     db.Open();
 
-                    for (int i = 0; i < CardNames.Count; i++)
+                    foreach (CardName cn in CardNames)
                     {
-                        if (!TableSets.Contains(CardNames[i].Name))
+                        if (!TableSets.Contains(cn.Name))
                         {
-                            cmd = new SQLiteCommand("INSERT INTO CardSets (setNumber, pokemonName, cardURL, cardCost, pokemonNumber) VALUES (@num,@name,@url,@cost,@cardnum)", db);
-                            cmd.Parameters.AddWithValue("@num", CardNames[i].CardSet);
-                            cmd.Parameters.AddWithValue("@name", CardNames[i].Name);
-                            cmd.Parameters.AddWithValue("@url", CardNames[i].URL);
-                            cmd.Parameters.AddWithValue("@cost", CardNames[i].Price);
-                            cmd.Parameters.AddWithValue("@cardnum", CardNames[i].CardNum);
+                            cmd = new SQLiteCommand("INSERT INTO PokemonCards (setNumber, pokemonName, cardURL, cardCost, pokemonNumber) VALUES (@num,@name,@url,@cost,@cardnum)", db);
+                            cmd.Parameters.AddWithValue("@num", cn.CardSet);
+                            cmd.Parameters.AddWithValue("@name", cn.Name);
+                            cmd.Parameters.AddWithValue("@url", cn.URL);
+                            cmd.Parameters.AddWithValue("@cost", cn.Price);
+                            cmd.Parameters.AddWithValue("@cardnum", cn.CardNum);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                        else
+                        {
+                            cmd = new SQLiteCommand("UPDATE PokemonCards " +
+                                "SET cardURL = @url, cardCost = @cost, " +
+                                "WHERE pokemonName = @name, pokemonNumber = @cardnum, setNumber = @num", db);
+                            cmd.Parameters.AddWithValue("@url", cn.URL);
+                            cmd.Parameters.AddWithValue("@cost", cn.Price);
+                            cmd.Parameters.AddWithValue("@name", cn.Name);
+                            cmd.Parameters.AddWithValue("@cardnum", cn.CardNum);
+                            cmd.Parameters.AddWithValue("@num", cn.CardSet);
 
                             cmd.ExecuteNonQuery();
                         }
@@ -106,6 +123,7 @@ namespace PokemonDatabase
         {
             try
             {
+                
                 List<string> TableSets = new List<string>();
                 SQLiteCommand cmd;
                 string sqlCmd;

@@ -11,7 +11,46 @@ namespace PokemonDatabase
 {
     class GenerateCardSets
     {
-        public List<CardSet> GetCardsSets()
+        public List<CardSet> GetCardsSetsFromPokellector()
+        {
+            string URL = @"https://www.pokellector.com/sets";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                Stream receiveStream = response.GetResponseStream();
+                StreamReader readStream = null;
+
+                if (response.CharacterSet == null) { readStream = new StreamReader(receiveStream); }
+                else { readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet)); }
+
+                string data = readStream.ReadToEnd();
+                Regex setLinks = new Regex("(?<=\" href=\"/sets)[ -z]*(?=\" title=\")");
+                Regex setNames = new Regex("(?<=.png\" title=\")[ -z]*(?=\"><span>)");
+                MatchCollection setLinksMatches = setLinks.Matches(data);
+                MatchCollection setNamesMatches = setNames.Matches(data);
+
+
+                List<CardSet> lSets = new List<CardSet>();
+                int countOfSets = 0;
+
+                Console.WriteLine(countOfSets);
+                foreach (Match setName in setNamesMatches)
+                {
+                    string alteredSetURL = @"https://www.pokellector.com/sets" + setLinksMatches[countOfSets].ToString().Split('"')[0];
+                    lSets.Add(new CardSet(setName.ToString(), alteredSetURL, countOfSets));
+                    countOfSets++;
+                }
+                Console.WriteLine(countOfSets);
+                PrintSets(lSets);
+                response.Close();
+                readStream.Close();
+                return lSets;
+            }
+            return null;
+
+        }
+        public List<CardSet> GetCardsSetsFromTCG()
         {
             string URL =  @"https://shop.tcgplayer.com/pokemon";
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
@@ -37,7 +76,7 @@ namespace PokemonDatabase
                 foreach (Match setName in setNamesMatches)
                 {
                     string alteredSetName = setName.ToString().Replace("&amp;", "&").Replace("&nbsp;", "").Replace("<br>", " ");
-                    lSets.Add(new CardSet(alteredSetName, setLinksMatches[countOfSets].ToString()));
+                    lSets.Add(new CardSet(alteredSetName, setLinksMatches[countOfSets].ToString(), countOfSets));
                     countOfSets++;
                 }
                 PrintSets(lSets);
@@ -56,28 +95,6 @@ namespace PokemonDatabase
                 cs.Print();
             }
             Console.Read();
-        }
-
-        private int RequestDelay()
-        {
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var request = WebRequest.Create(@"https://www.tcgplayer.com/robots.txt");
-
-            using (var response = request.GetResponse())
-            using (var content = response.GetResponseStream())
-            using (var reader = new StreamReader(content))
-            {
-                var strContent = reader.ReadToEnd().ToLower();
-                foreach (var line in strContent.Split('\n'))
-                {
-                    if (line.Contains("crawl-delay"))
-                    {
-                        return Int32.Parse(Regex.Match(line, @"\d+$").ToString());
-                    }
-                }
-            }
-            return 0;
         }
     }
 }

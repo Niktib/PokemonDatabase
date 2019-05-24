@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PokemonDatabase
@@ -18,56 +19,57 @@ namespace PokemonDatabase
             SetURL = _setURL;
             SetIDKey = _setIDKey;
         }
-        public List<CardName> GetCardsNames()
-        {
-            string[] tcgArray = new string[] { SetURL + "?newSearch=false&Type=Cards&orientation=grid&lu=true&PageNumber=", "gtmData.searchResults = [];", "<script>trackProductsEvent" };
-            return GetAllCards(tcgArray);
-
-        }
-        private List<CardName> GetAllCards(string[] URL)
+        public List<CardName> GetCardsNamesPokellector()
         {
             List<CardName> lCards = new List<CardName>();
-            for (int i = 1; i < 11; i++)
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(SetURL);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL[0] + i);
-                Console.WriteLine("");
-                Console.WriteLine(URL[0] + i);
-                Console.WriteLine("");
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                Stream receiveStream = response.GetResponseStream();
+                StreamReader readStream = null;
 
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (response.CharacterSet == null) { readStream = new StreamReader(receiveStream); }
+                else { readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet)); }
+
+                string data = readStream.ReadToEnd();
+                Regex cardNamesAndNums = new Regex("(?<=<div class=\"plaque\">)[ -zé]*(?=</div>)");
+                Regex cardURL = new Regex("(?<=<a href=\")[ -zé]*(?=\" name=)");
+                MatchCollection cNANMatches = cardNamesAndNums.Matches(data);
+                MatchCollection cURLMatches = cardURL.Matches(data);
+                int countOfCards = 0;
+                foreach (Match setName in cNANMatches)
                 {
-                    Stream receiveStream = response.GetResponseStream();
-                    StreamReader readStream = null;
-                    string beWary = "abcdefghijklmnopqrstuvwxyz";
-                    string data;
-
-                    if (response.CharacterSet == null) { readStream = new StreamReader(receiveStream); }
-                    else { readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet)); }
-
-                    while ((data = readStream.ReadLine()).Contains(URL[1]) == false) { }
-                    
-
-                    while ((data = readStream.ReadLine()).Contains(URL[2]) == false)
+                    string alteredSetURL = @"https://www.pokellector.com" + cURLMatches[countOfCards].ToString();
+                    string[] nameDivision = setName.ToString().Split(new[] { '-' }, 2);
+                    int ACardNum = 0;
+                    string ACardName = "";
+                    if (nameDivision.Length == 2)
                     {
-
-                        if (data.Contains("<a href=\"/pokemon/") && !data.Contains(beWary))
-                        {
-                            lCards.Add(AssignInfo(data.Trim().Replace("<a href=\"", "")));
-                            beWary = lCards[lCards.Count-1].URL;
-                        }
+                        ACardName = nameDivision[1].Trim();
+                        ACardNum = Convert.ToInt32(nameDivision[0].Substring(1).Trim());
                     }
-                    response.Close();
-                    readStream.Close();
+                    else
+                    {
+                        ACardName = nameDivision[0];
+                        ACardNum = 0;
+                    }
+                    lCards.Add(new CardName(SetIDKey, ACardName, ACardNum, alteredSetURL));
+                    countOfCards++;
                 }
-                else
-                {
-                    Console.WriteLine("Oh no"); 
-                }
-            }
+                response.Close();
+                readStream.Close();
+                foreach (CardName cn in lCards) {   cn.Print(); }
 
+            }
+            else
+            {
+                Console.WriteLine("Oh no");
+            }
             return lCards;
         }
+
         private CardName AssignInfo(string nameString)
         {
             CardName currentCard = new CardName();

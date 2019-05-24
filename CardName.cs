@@ -24,6 +24,19 @@ namespace PokemonDatabase
             Price = 0;
             CardArt = null;
         }
+        public CardName(int _CardSet, string _CardName, int _CardNum, string _URL)
+        {
+            CardSet = _CardSet;
+            CardNum = _CardNum;
+            URL = _URL;
+            Name = _CardName;
+            Price = 0;
+            CardArt = null;
+        }
+        public void Print()
+        {
+            Console.WriteLine(string.Format("Number {0}, Name {1}, URL {2}", CardNum, Name, URL));
+        }
 
     }
 }
